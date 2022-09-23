@@ -1,24 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import NavBar from "./components/NavBar";
+import 'animate.css';
+import { Outlet } from "react-router-dom";
+import Context from "./context/Context";
+import React,{useState, useEffect} from "react";
 
 function App() {
+  const [gallery, setGallery] = useState([]);
+
+  const endpoint = "json/fotos.json";
+  const getImgNatural = async () => {
+    const res = await fetch(endpoint);
+    let data = await res.json();
+     let dataFilt = data.photos.map((item) => ({
+        id: item.id,
+        src: item.src.tiny,
+        descripcion: item.alt,
+        liked: false
+      }));
+      setGallery(dataFilt);
+      console.log(dataFilt)
+  };
+
+  useEffect(() => {
+    getImgNatural();
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Context.Provider value={{gallery, setGallery}}>
+        <NavBar />
+        <main className="container text-center mt-5">
+          <Outlet />
+        </main>
+      </Context.Provider>
+    </>
   );
 }
 
